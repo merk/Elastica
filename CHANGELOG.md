@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file based on the
 ### Deprecated
 - Configuring the logger in \Elastica\Client $config constructor is deprecated and will be removed. Use the $logger argument instead.
 - Extracted creation of ResultSet objects to a new dedicated ResultSet\Builder implementation. #1065
+- Client::addDocuments, Client::updateDocuments, Client::deleteDocuments, Client::deleteIds, Client::bulk are deprecated and will be removed in 4.0. Use the Bulk class directly.
 
 ### Deprecated
 - All properties in the \Elastica\ResultSet class will be moved to private in 4.0. To manipulate the creation of a ResultSet, implement the \Elastica\ResultSet\BuilderInterface and pass your new Builder to the \Elastica\Search instances.

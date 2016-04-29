@@ -279,6 +279,8 @@ class Client
      * set inside the document, because for bulk settings documents,
      * documents can belong to any type and index
      *
+     * @deprecated Use a Bulk object directly
+     *
      * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
      *
      * @param array|\Elastica\Document[] $docs Array of Elastica\Document
@@ -289,15 +291,7 @@ class Client
      */
     public function updateDocuments(array $docs)
     {
-        if (empty($docs)) {
-            throw new InvalidException('Array has to consist of at least one element');
-        }
-
-        $bulk = new Bulk($this);
-
-        $bulk->addDocuments($docs, \Elastica\Bulk\Action::OP_TYPE_UPDATE);
-
-        return $bulk->send();
+        return $this->doBulk($docs, Action::OP_TYPE_UPDATE);
     }
 
     /**
@@ -306,6 +300,8 @@ class Client
      * Array of \Elastica\Document as input. Index and type has to be
      * set inside the document, because for bulk settings documents,
      * documents can belong to any type and index
+     *
+     * @deprecated Use a Bulk object directly
      *
      * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
      *
@@ -317,15 +313,7 @@ class Client
      */
     public function addDocuments(array $docs)
     {
-        if (empty($docs)) {
-            throw new InvalidException('Array has to consist of at least one element');
-        }
-
-        $bulk = new Bulk($this);
-
-        $bulk->addDocuments($docs);
-
-        return $bulk->send();
+        return $this->doBulk($docs, Action::OP_TYPE_CREATE);
     }
 
     /**
@@ -440,6 +428,8 @@ class Client
     /**
      * Bulk deletes documents.
      *
+     * @deprecated Use a Bulk object directly
+     *
      * @param array|\Elastica\Document[] $docs
      *
      * @throws \Elastica\Exception\InvalidException
@@ -448,14 +438,7 @@ class Client
      */
     public function deleteDocuments(array $docs)
     {
-        if (empty($docs)) {
-            throw new InvalidException('Array has to consist of at least one element');
-        }
-
-        $bulk = new Bulk($this);
-        $bulk->addDocuments($docs, Action::OP_TYPE_DELETE);
-
-        return $bulk->send();
+        return $this->doBulk($docs, Action::OP_TYPE_DELETE);
     }
 
     /**
@@ -549,6 +532,8 @@ class Client
     /**
      * Deletes documents with the given ids, index, type from the index.
      *
+     * @deprecated Use the Bulk object directly
+     *
      * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
      *
      * @param array                  $ids     Document ids
@@ -595,6 +580,8 @@ class Client
      *         array('user' => array('name' => 'hans')),
      *         array('delete' => array('_index' => 'test', '_type' => 'user', '_id' => '2'))
      * );
+     *
+     * @deprecated Use the Bulk object directly
      *
      * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
      *
@@ -746,5 +733,22 @@ class Client
         $this->_logger = $logger;
 
         return $this;
+    }
+
+    /**
+     * @param Document[] $docs
+     * @param string $action
+     * @return Bulk\ResponseSet
+     */
+    private function doBulk($docs, $action)
+    {
+        if (empty($docs)) {
+            throw new InvalidException('$docs array must consist of at least one element');
+        }
+
+        $bulk = new Bulk($this);
+        $bulk->addDocuments($docs, $action);
+
+        return $bulk->send();
     }
 }
